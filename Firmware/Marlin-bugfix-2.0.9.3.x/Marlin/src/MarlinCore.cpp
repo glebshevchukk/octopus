@@ -258,6 +258,9 @@ MarlinState marlin_state = MF_INITIALIZING;
 
 // For M109 and M190, this flag may be cleared (by M108) to exit the wait loop
 bool wait_for_heatup = true;
+volatile bool writeExtruderFlag=false;
+volatile char extruderData[32]="";
+
 
 // For M0/M1, this flag may be cleared (by M108) to exit the wait-for-user loop
 #if HAS_RESUME_CONTINUE
@@ -748,6 +751,18 @@ inline void manage_inactivity(const bool no_stepper_sleep=false) {
   #endif
 }
 
+void send_extruder_data(){
+    if(writeExtruderFlag) {
+      writeExtruderFlag = false;
+      int port = 3;
+      char tempArray[32] = "";
+      for(int i = 0; i < 32; i++){tempArray[i]=extruderData[i];};
+      PORT_REDIRECT(WITHIN(port, 0, NUM_SERIAL) ? (port ? SERIAL_PORTMASK(port - 1) : SerialMask::All) : multiSerial.portMask);
+      SERIAL_ECHOLN(tempArray);
+    }
+    return;
+}
+
 /**
  * Standard idle routine keeps the machine alive:
  *  - Core Marlin activities
@@ -856,6 +871,9 @@ void idle(bool no_stepper_sleep/*=false*/) {
       TERN_(BUFFER_MONITORING, queue.auto_report_buffer_statistics());
     }
   #endif
+
+  // Send any extruder data if it exists
+  send_extruder_data();
 
   // Update the Průša MMU2
   TERN_(HAS_PRUSA_MMU2, mmu2.mmu_loop());
@@ -1668,7 +1686,6 @@ void loop() {
     #endif
 
     endstops.event_handler();
-
     TERN_(HAS_TFT_LVGL_UI, printer_state_polling());
 
   } while (ENABLED(__AVR__)); // Loop forever on slower (AVR) boards

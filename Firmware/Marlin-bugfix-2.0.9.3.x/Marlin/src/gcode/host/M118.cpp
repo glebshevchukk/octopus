@@ -22,7 +22,7 @@
 
 #include "../gcode.h"
 #include "../../core/serial.h"
-
+#include "../../module/planner.h"
 /**
  * M118: Display a message in the host console.
  *

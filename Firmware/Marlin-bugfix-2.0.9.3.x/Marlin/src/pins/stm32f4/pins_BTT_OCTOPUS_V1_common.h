@@ -54,8 +54,8 @@
 #define Z2_DIAG_PIN                         PG11  // Z2-STOP
 #define E0_DIAG_PIN                         PG12  // E0DET
 #define E1_DIAG_PIN                         PG13  // E1DET
-#define E2_DIAG_PIN                         PG14  // E2DET
-#define E3_DIAG_PIN                         PG15  // E3DET
+#define Z4_DIAG_PIN                         PG14  // E2DET
+#define Z3_DIAG_PIN                         PG15  // E3DET
 
 //
 // Z Probe (when not Z_MIN_PIN)
@@ -123,16 +123,16 @@
 #ifdef Z_STALL_SENSITIVITY
   #define Z_STOP_PIN                  Z_DIAG_PIN
   #if Z_HOME_TO_MIN
-    #define Z_MAX_PIN                E2_DIAG_PIN  // PWRDET
+    #define Z_MAX_PIN                Z4_DIAG_PIN  // PWRDET
   #else
-    #define Z_MIN_PIN                E2_DIAG_PIN  // PWRDET
+    #define Z_MIN_PIN                Z4_DIAG_PIN  // PWRDET
   #endif
 #elif NEEDS_Z_MINMAX
   #ifndef Z_MIN_PIN
     #define Z_MIN_PIN                 Z_DIAG_PIN  // Z-STOP
   #endif
   #ifndef Z_MAX_PIN
-    #define Z_MAX_PIN                E2_DIAG_PIN  // PWRDET
+    #define Z_MAX_PIN                Z4_DIAG_PIN  // PWRDET
   #endif
 #else
   #define Z_STOP_PIN                  Z_DIAG_PIN  // Z-STOP
@@ -209,28 +209,34 @@
   #define E1_CS_PIN                         PE4
 #endif
 
-#define E2_STEP_PIN                         PE2   // MOTOR 6
-#define E2_DIR_PIN                          PE3
-#define E2_ENABLE_PIN                       PD4
-#ifndef E2_CS_PIN
+#define Z4_STEP_PIN                         PE2   // MOTOR 6
+#define Z4_DIR_PIN                          PE3
+#define Z4_ENABLE_PIN                       PD4
+#ifndef Z4_CS_PIN
 
-  #define E2_CS_PIN                         PE1
+  #define Z4_CS_PIN                         PE1
 #endif
 
-#define E3_STEP_PIN                         PE6   // MOTOR 7
-#define E3_DIR_PIN                          PA14
-#define E3_ENABLE_PIN                       PE0
-#ifndef E3_CS_PIN
-  #define E3_CS_PIN                         PD3
+#define Z3_STEP_PIN                         PE6   // MOTOR 7
+#define Z3_DIR_PIN                          PA14
+#define Z3_ENABLE_PIN                       PE0
+#ifndef Z3_CS_PIN
+  #define Z3_CS_PIN                         PD3
 #endif
 
 //
 // Temperature Sensors
 //
 #define TEMP_BED_PIN                        PF3   // TB
-#define TEMP_1_PIN                          PF5   // TH1
+//#define TEMP_1_PIN                          PF5   // TH1
 #define TEMP_2_PIN                          PF6   // TH2
 #define TEMP_3_PIN                          PF7   // TH3
+
+
+//EXTRA SPI TEMP PIN
+#define TEMP_0_CS_PIN PA15
+#define TEMP_0_SCK_PIN PB3
+#define TEMP_0_MISO_PIN PB4
 
 //
 // Heaters / Fans
@@ -241,6 +247,7 @@
 #define HEATER_2_PIN                        PB10  // Heater2
 #define HEATER_3_PIN                        PB11  // Heater3
 
+//GLEB CHANGE: WAS PA8, NOW IT IS PB3
 #define FAN_PIN                             PA8   // Fan0
 #define FAN1_PIN                            PE5   // Fan1
 #define FAN2_PIN                            PD12  // Fan2
@@ -289,7 +296,7 @@
   //#define Z2_HARDWARE_SERIAL Serial1
   //#define E0_HARDWARE_SERIAL Serial1
   //#define E1_HARDWARE_SERIAL Serial1
-  //#define E2_HARDWARE_SERIAL Serial1
+  //#define Z4_HARDWARE_SERIAL Serial1
   //#define E3_HARDWARE_SERIAL Serial1
   //#define E4_HARDWARE_SERIAL Serial1
 
@@ -311,11 +318,11 @@
   #define E1_SERIAL_TX_PIN                  PE4
   #define E1_SERIAL_RX_PIN      E1_SERIAL_TX_PIN
 
-  #define E2_SERIAL_TX_PIN                  PE1
-  #define E2_SERIAL_RX_PIN      E2_SERIAL_TX_PIN
+  #define Z4_SERIAL_TX_PIN                  PE1
+  #define Z4_SERIAL_RX_PIN      Z4_SERIAL_TX_PIN
 
-  #define E3_SERIAL_TX_PIN                  PD3
-  #define E3_SERIAL_RX_PIN      E3_SERIAL_TX_PIN
+  #define Z3_SERIAL_TX_PIN                  PD3
+  #define Z3_SERIAL_RX_PIN      Z3_SERIAL_TX_PIN
 
   // Reduce baud rate to improve software serial reliability
   #define TMC_BAUD_RATE                    19200

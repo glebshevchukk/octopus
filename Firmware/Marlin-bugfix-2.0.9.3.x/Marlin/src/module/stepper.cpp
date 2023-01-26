@@ -1631,7 +1631,6 @@ void Stepper::isr() {
 
   // Set the next ISR to fire at the proper time
   HAL_timer_set_compare(MF_TIMER_STEP, hal_timer_t(next_isr_ticks));
-
   // Don't forget to finally reenable interrupts
   hal.isr_on();
 }
@@ -1975,6 +1974,15 @@ uint32_t Stepper::block_phase_isr() {
   // If there is a current block
   if (current_block) {
 
+     // Check for serial sends
+    if(current_block->serial[0] != '\0'){
+      for(int i = 0; i < 32; i++){
+        extruderData[i]=current_block->serial[i];
+        current_block->serial[i] = '\0';
+      };
+      writeExtruderFlag=true;
+    }
+  
     // If current block is finished, reset pointer and finalize state
     if (step_events_completed >= step_event_count) {
       #if ENABLED(DIRECT_STEPPING)
@@ -2172,24 +2180,24 @@ uint32_t Stepper::block_phase_isr() {
   // If there is no current block at this point, attempt to pop one from the buffer
   // and prepare its movement
   if (!current_block) {
+    
 
     // Anything in the buffer?
     if ((current_block = planner.get_current_block())) {
 
       // Sync block? Sync the stepper counts or fan speeds and return
-      while (current_block->flag & BLOCK_MASK_SYNC) {
-
-        #if ENABLED(LASER_SYNCHRONOUS_M106_M107)
-          const bool is_sync_fans = TEST(current_block->flag, BLOCK_BIT_SYNC_FANS);
-          if (is_sync_fans) planner.sync_fan_speeds(current_block->fan_speed);
-        #else
-          constexpr bool is_sync_fans = false;
-        #endif
-
-        if (!is_sync_fans) _set_position(current_block->position);
-
+      while (current_block->flag & BLOCK_FLAG_SYNC_POSITION) {
+        
+        _set_position(current_block->position);
+        if(current_block->serial[0] != '\0'){
+        for(int i = 0; i < 32; i++){
+          extruderData[i]=current_block->serial[i];
+          current_block->serial[i] = '\0';
+        };
+        writeExtruderFlag=true;
+        }
+        
         discard_current_block();
-
         // Try to get a new block
         if (!(current_block = planner.get_current_block()))
           return interval; // No more queued movements!

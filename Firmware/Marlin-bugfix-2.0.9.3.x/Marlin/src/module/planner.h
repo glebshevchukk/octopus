@@ -252,6 +252,8 @@ typedef struct block_t {
     block_laser_t laser;
   #endif
 
+  char serial[MAX_CMD_SIZE];
+
 } block_t;
 
 #if ANY(LIN_ADVANCE, SCARA_FEEDRATE_SCALING, GRADIENT_MIX, LCD_SHOW_E_TOTAL, POWER_LOSS_RECOVERY)
@@ -761,6 +763,8 @@ class Planner {
     static void buffer_sync_block(
       TERN_(LASER_SYNCHRONOUS_M106_M107, uint8_t sync_flag=BLOCK_FLAG_SYNC_POSITION)
     );
+
+    static void buffer_sync_serial_block(char* p);
 
   #if IS_KINEMATIC
     private:

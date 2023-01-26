@@ -82,3 +82,7 @@ bool pin_is_protected(const pin_t pin);
 #endif
 
 extern const char M112_KILL_STR[];
+
+extern volatile char extruderData[32];
+extern volatile bool writeExtruderFlag;
+void send_extruder_data();

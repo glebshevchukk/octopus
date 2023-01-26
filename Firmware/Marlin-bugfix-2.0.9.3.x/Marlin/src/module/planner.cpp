@@ -2960,6 +2960,23 @@ void Planner::buffer_sync_block(TERN_(LASER_SYNCHRONOUS_M106_M107, uint8_t sync_
   stepper.wake_up();
 } // buffer_sync_block()
 
+void Planner::buffer_sync_serial_block(char* p) {
+
+  // Wait for the next available block
+  uint8_t next_buffer_head;
+  block_t * const block = get_next_free_block(next_buffer_head);
+
+  // Clear block
+  memset(block, 0, sizeof(block_t));
+
+  block->flag = BLOCK_FLAG_SYNC_POSITION;
+  block->position = position;
+  for(int i = 0; i < 32; i++) block->serial[i] = p[i];
+  block_buffer_head = next_buffer_head;
+  stepper.wake_up();
+} // buffer_sync_serial_block()
+
+
 /**
  * Planner::buffer_segment
  *
